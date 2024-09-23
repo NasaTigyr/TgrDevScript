@@ -33,7 +33,19 @@ if [ ! -d "$LIB_DIR" ]; then
     echo "If you have any external libraries, place them in the $LIB_DIR directory."
 fi
 
+# Step 1: Find the .java file containing the main method
+MAIN_FILE=$(grep -rl "public[[:space:]]\+static[[:space:]]\+void[[:space:]]\+main"  "$SRC_DIR")
+
+if [ -z "$MAIN_FILE" ]; then
+    echo "No Java file with a main method found!"
+    exit 1
+fi
+
+# Step 2: Extract the class name (assuming the filename matches the class name)
+MAIN_CLASS=$(basename "$MAIN_FILE" .java)
+#
 # Compile the .java files from src to bin
+#
 echo "Compiling Java files..."
 javac -d "$BIN_DIR" -cp "$LIB_DIR/*" $(find "$SRC_DIR" -name "*.java")
 
@@ -46,7 +58,7 @@ echo "Compilation successful."
 
 # Run the program
 # You can specify the main class here. For example, if you have a class with the `main` method called Main:
-MAIN_CLASS="Main"
+#MAIN_CLASS="Main"
 
 echo "Running the program..."
 java -cp "$BIN_DIR:$LIB_DIR/*" $MAIN_CLASS
